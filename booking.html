@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-sidebar {
+            position: fixed;
+            top: 0; right: -350px;
+            width: 350px; height: 100%;
+            background: #fff; z-index: 1050;
+            box-shadow: -2px 0 12px #0002;
+            transition: right 0.3s;
+            overflow-y: auto;
+        }
+        .profile-sidebar.open { right: 0; }
+        .profile-sidebar .close-btn {
+            position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer;
+        }
+        .profile-avatar {
+            width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #fff; margin: 0 auto 1rem auto;
+        }
+        #parkingSlotsContainer {
+            display: flex !important;
+            flex-direction: row;
+            overflow-x: auto;
+            gap: 1rem;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #0d6efd #f1f1f1;
+        }
+        #parkingSlotsContainer::-webkit-scrollbar {
+            height: 8px;
+        }
+        #parkingSlotsContainer::-webkit-scrollbar-thumb {
+            background: #0d6efd;
+            border-radius: 4px;
+        }
+        #parkingSlotsContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .parking-slot-card {
+            min-width: 220px;
+            max-width: 260px;
+            margin-bottom: 0;
+        }
+        .parking-slot-card img {
+            height: 140px !important;
+            object-fit: cover;
+        }
+        .booking-progress .step {
+            font-size: 0.9rem;
+            color: #6c757d;
+            transition: color 0.3s;
+        }
+        .booking-progress .step.active {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .room-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        .room-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .room-card.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9ff;
+        }
+        .room-card img {
+            height: 150px;
+            object-fit: cover;
+        }
+        .booking-step {
+            animation: fadeIn 0.3s ease-in;
+        }
+        .parking-slot-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
+        }
+        .parking-slot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .parking-slot-card.border-primary {
+            border-color: #0d6efd !important;
+            background-color: #f8f9ff !important;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .parking-type-card {
+            min-width: 220px;
+            max-width: 280px;
+            margin: 0 auto 1rem auto;
+        }
+        .parking-type-card img {
+            height: 120px !important;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/hotel_lobby.jpg" alt="Hotel Logo" class="img-fluid" style="height:36px;width:36px;border-radius:8px;object-fit:cover;"> Hotel Kali
+        </a>
+        <div class="d-flex align-items-center">
+            <a href="rooms.html" class="btn btn-outline-light me-2">Rooms</a>
+            <a href="booking.html" class="btn btn-outline-light me-2">Book Room & Parking</a>
+            <span id="authButtons">
+                <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+                <a href="register.html" class="btn btn-outline-light me-2">Register</a>
+            </span>
+            <span id="profileIconContainer"></span>
+        </div>
+    </div>
+</nav>
+
+<div class="container fade-in">
+    <h2 class="mb-4">Book a Room</h2>
+    
+    <!-- Booking Progress -->
+    <div class="booking-progress mb-4">
+        <div class="progress" style="height: 4px;">
+            <div class="progress-bar" id="bookingProgress" role="progressbar" style="width: 25%"></div>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+            <span class="step active" id="step1">1. Select Room</span>
+            <span class="step" id="step2">2. Guest Details</span>
+            <span class="step" id="step3">3. Parking (Optional)</span>
+            <span class="step" id="step4">4. Confirm Booking</span>
+        </div>
+    </div>
+
+    <!-- Step 1: Room Selection -->
+    <div id="step1Content" class="booking-step">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-house me-2"></i>Select Your Room</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-calendar-date me-2 text-primary"></i>Check-in Date</label>
+                            <input type="date" id="checkinDate" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-calendar-date me-2 text-primary"></i>Check-out Date</label>
+                            <input type="date" id="checkoutDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-people me-2 text-success"></i>Number of Guests</label>
+                            <select id="guestCount" class="form-select">
+                                <option value="1">1 Guest</option>
+                                <option value="2">2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-search me-2 text-info"></i>Available Rooms</label>
+                    <div id="availableRooms" class="row">
+                        <!-- Available rooms will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Quick Parking Info -->
+                <div class="alert alert-info mt-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-car-front fs-4 me-3 text-primary"></i>
+                        <div>
+                            <h6 class="mb-1">Need Parking?</h6>
+                            <p class="mb-0">You can add secure parking to your room booking in the next step. We offer various parking options including EV charging.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-primary" onclick="nextStep()" id="nextStep1" disabled>
+                    Next: Guest Details <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Guest Details -->
+    <div id="step2Content" class="booking-step" style="display: none;">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Guest Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-person me-2"></i>Full Name</label>
+                            <input type="text" id="guestName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-envelope me-2"></i>Email Address</label>
+                            <input type="email" id="guestEmail" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-telephone me-2"></i>Phone Number</label>
+                            <input type="tel" id="guestPhone" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-credit-card me-2"></i>Payment Method</label>
+                            <select id="paymentMethod" class="form-select">
+                                <option value="credit_card">Credit Card</option>
+                                <option value="debit_card">Debit Card</option>
+                                <option value="cash">Cash on Arrival</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-chat-text me-2"></i>Special Requests</label>
+                            <textarea id="specialRequests" class="form-control" rows="3" placeholder="Any special requests or preferences..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                        <i class="bi bi-arrow-left"></i> Back: Room Selection
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="nextStep()" id="nextStep2">
+                        Next: Parking <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Parking -->
+    <div id="step3Content" class="booking-step" style="display: none;">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>Parking (Optional)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Add secure parking to your stay!</strong> Our parking facilities include 24/7 security, CCTV monitoring, and various vehicle types support.
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-shield-check fs-1 text-success mb-2"></i>
+                                <h6>Secure Parking</h6>
+                                <small class="text-muted">24/7 Security & CCTV</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h6>Available Parking Types</h6>
+                    <div id="parkingTypesContainer" class="row"></div>
+                </div>
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="includeParking" onchange="toggleParkingOptions()">
+                    <label class="form-check-label" for="includeParking">
+                        <strong>Yes, I want to include parking with my room booking</strong>
+                    </label>
+                </div>
+                <div id="parkingOptions" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-car-front me-2"></i>Vehicle Number</label>
+                                <input type="text" id="vehicleNumber" class="form-control" placeholder="Enter vehicle number">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-truck me-2"></i>Vehicle Type</label>
+                                <select id="vehicleType" class="form-select">
+                                    <option value="car">Car</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="truck">Truck</option>
+                                    <option value="motorcycle">Motorcycle</option>
+                                    <option value="electric">Electric Vehicle</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-credit-card me-2"></i>Parking Payment Method</label>
+                                <select id="parkingPaymentMethod" class="form-select">
+                                    <option value="credit_card">Credit Card</option>
+                                    <option value="debit_card">Debit Card</option>
+                                    <option value="cash">Cash</option>
+                                </select>
+                            </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-grid-3x3-gap me-2"></i>Parking Slot</label>
+                        <div id="parkingSlotsContainer" class="row"></div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                        <i class="bi bi-arrow-left"></i> Back: Guest Details
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="nextStep()" id="nextStep3">
+                        Next: Confirm Booking <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4: Booking Confirmation -->
+    <div id="step4Content" class="booking-step" style="display: none;">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Confirm Your Booking</h5>
+            </div>
+            <div class="card-body">
+                <div id="bookingSummary">
+                    <!-- Booking summary will be displayed here -->
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                        <i class="bi bi-arrow-left"></i> Back: Parking
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="confirmBooking()" id="confirmBookingBtn">
+                        <i class="bi bi-check-lg"></i> Confirm & Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back to Top Button -->
+<button id="backToTop" title="Back to Top"><i class="bi bi-arrow-up"></i></button>
+
+<footer class="footer mt-auto">
+    <div class="footer-social">
+        <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" title="Twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" title="Mail"><i class="bi bi-envelope"></i></a>
+    </div>
+    <div>Contact us: hotelkali6094@gmail.com | 8733803700 | S.G. highway</div>
+    <form class="newsletter-form mt-2">
+        <input type="email" placeholder="Subscribe to our newsletter" required>
+        <button type="submit"><i class="bi bi-send"></i> Subscribe</button>
+    </form>
+    <div class="mt-2">&copy; 2024 Hotel Kali Demo. All rights reserved.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Login enforcement
+if (!localStorage.getItem('user')) {
+    alert('You must be logged in to book a room.');
+    window.location.href = 'login.html';
+}
+
+let currentStep = 1;
+let selectedRoom = null;
+let allRooms = [];
+let bookingData = {};
+let selectedParkingSlot = null;
+
+// Initialize the booking system
+document.addEventListener('DOMContentLoaded', function() {
+    loadAvailableRooms();
+    setupDateValidation();
+    // Always render parking types in step 3 using sampleParkingTypes
+    parkingTypes = sampleParkingTypes;
+    renderParkingTypes(parkingTypes);
+});
+
+// Load available rooms
+async function loadAvailableRooms() {
+    const container = document.getElementById('availableRooms');
+    container.innerHTML = '<div class="col-12"><div class="alert alert-info">Loading rooms...</div></div>';
+    const sampleRooms = [
+        // Deluxe Rooms
+        {id: 1, number: '101', type: 'Deluxe', price: 3000, description: 'Comfortable room with modern amenities, ideal for business or leisure travelers.', features: 'AC, Wifi, Breakfast included, Queen bed'},
+        {id: 2, number: '102', type: 'Deluxe', price: 3000, description: 'Comfortable room with modern amenities, ideal for business or leisure travelers.', features: 'AC, Wifi, Breakfast included, Queen bed'},
+        {id: 3, number: '103', type: 'Deluxe', price: 3000, description: 'Comfortable room with modern amenities, ideal for business or leisure travelers.', features: 'AC, Wifi, Breakfast included, Queen bed'},
+        {id: 4, number: '104', type: 'Deluxe', price: 3000, description: 'Comfortable room with modern amenities, ideal for business or leisure travelers.', features: 'AC, Wifi, Breakfast included, Queen bed'},
+        {id: 5, number: '105', type: 'Deluxe', price: 3000, description: 'Comfortable room with modern amenities, ideal for business or leisure travelers.', features: 'AC, Wifi, Breakfast included, Queen bed'},
+        // Executive Suites
+        {id: 6, number: '106', type: 'Executive Suite', price: 4500, description: 'Spacious suite with a separate living area and premium facilities.', features: 'King bed, AC, Wifi, Mini Bar, City View'},
+        {id: 7, number: '107', type: 'Executive Suite', price: 4500, description: 'Spacious suite with a separate living area and premium facilities.', features: 'King bed, AC, Wifi, Mini Bar, City View'},
+        {id: 8, number: '108', type: 'Executive Suite', price: 4500, description: 'Spacious suite with a separate living area and premium facilities.', features: 'King bed, AC, Wifi, Mini Bar, City View'},
+        // Family Suites
+        {id: 9, number: '109', type: 'Family Suite', price: 6000, description: 'Large suite with two bedrooms and a living area, perfect for families.', features: '2 Bedrooms, AC, Wifi, Breakfast, Living Area'},
+        {id: 10, number: '110', type: 'Family Suite', price: 6000, description: 'Large suite with two bedrooms and a living area, perfect for families.', features: '2 Bedrooms, AC, Wifi, Breakfast, Living Area'},
+        // Presidential Suite
+        {id: 11, number: '111', type: 'Presidential Suite', price: 10000, description: 'Luxurious suite with top-tier amenities and exclusive services.', features: 'King bed, Jacuzzi, Private lounge, Butler service'}
+    ];
+    try {
+        console.log('Fetching rooms from API...');
+        const response = await fetch('http://localhost:5000/api/rooms');
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        allRooms = await response.json();
+        console.log('Rooms loaded:', allRooms);
+        if (allRooms && allRooms.length > 0) {
+            displayAvailableRooms();
+        } else {
+            allRooms = sampleRooms;
+            container.innerHTML = '<div class="col-12"><div class="alert alert-warning">No rooms found in the database. Showing sample rooms.</div></div>';
+            displayAvailableRooms();
+        }
+    } catch (error) {
+        console.error('Error loading rooms:', error);
+        allRooms = sampleRooms;
+        container.innerHTML = '<div class="col-12"><div class="alert alert-danger">Error loading rooms from backend. Showing sample rooms.</div></div>';
+        displayAvailableRooms();
+    }
+}
+
+// Display available rooms
+function displayAvailableRooms() {
+    const typeImages = {
+        'Deluxe': 'images/room1.jpg',
+        'Executive Suite': 'images/room2.jpg',
+        'Family Suite': 'images/room3.jpg',
+        'Standard': 'images/room1.jpg',
+        'Presidential Suite': 'images/room2.jpg',
+        'Single': 'images/room1.jpg',
+        'Twin': 'images/room2.jpg',
+        'Studio': 'images/room3.jpg'
+    };
+    const typeLabels = {
+        'Deluxe': 'Deluxe Room',
+        'Executive Suite': 'Executive Suite',
+        'Family Suite': 'Family Suite',
+        'Standard': 'Standard Room',
+        'Presidential Suite': 'Presidential Suite',
+        'Single': 'Single Room',
+        'Twin': 'Twin Room',
+        'Studio': 'Studio Room'
+    };
+    const container = document.getElementById('availableRooms');
+    container.innerHTML = '';
+    if (!allRooms || allRooms.length === 0) {
+        container.innerHTML = '<div class="col-12"><div class="alert alert-warning">No rooms available at the moment.</div></div>';
+        return;
+    }
+    // Group rooms by type
+    const grouped = {};
+    allRooms.forEach(room => {
+        if (!grouped[room.type]) grouped[room.type] = [];
+        grouped[room.type].push(room);
+    });
+    Object.keys(grouped).forEach(type => {
+        // Room type header
+        const typeHeader = document.createElement('h4');
+        typeHeader.textContent = typeLabels[type] || type;
+        typeHeader.className = 'mt-4 mb-3';
+        container.appendChild(typeHeader);
+        // Room cards
+        const row = document.createElement('div');
+        row.className = 'row';
+        grouped[type].forEach(room => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-4';
+            const imageSrc = `images/${room.number}.jpg`;
+            col.innerHTML = `
+                <div class="card h-100 room-card" onclick="selectRoom(${room.id})">
+                    <img src="${imageSrc}" class="card-img-top img-fluid" alt="Room ${room.number}" onerror="this.src='${typeImages[type] || 'images/room1.jpg'}'">
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">Room ${room.number}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${typeLabels[type] || type}</h6>
+                        <p class="card-text small text-muted">${room.description || ''}</p>
+                        <div class="mb-2">${room.features ? room.features.split(',').map(f => `<span class='badge bg-primary me-1 mb-1'>${f.trim()}</span>`).join('') : ''}</div>
+                        <div class="fw-bold mb-2">₹${room.price} per night</div>
+                    </div>
+                </div>
+            `;
+            row.appendChild(col);
+        });
+        container.appendChild(row);
+    });
+}
+
+// Select a room
+function selectRoom(roomId) {
+    selectedRoom = allRooms.find(r => r.id === roomId);
+    
+    // Update UI to show selected room
+    document.querySelectorAll('.room-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+    
+    // Enable next button
+    document.getElementById('nextStep1').disabled = false;
+}
+
+// Setup date validation
+function setupDateValidation() {
+    const checkinDate = document.getElementById('checkinDate');
+    const checkoutDate = document.getElementById('checkoutDate');
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    checkinDate.min = today;
+    
+    checkinDate.addEventListener('change', function() {
+        checkoutDate.min = this.value;
+        if (checkoutDate.value && checkoutDate.value <= this.value) {
+            checkoutDate.value = '';
+        }
+    });
+}
+
+// Navigation functions
+function nextStep() {
+    console.log('nextStep called, current step:', currentStep);
+    
+    if (currentStep === 1) {
+        if (!document.getElementById('checkinDate').value || !document.getElementById('checkoutDate').value) {
+            alert('Please select check-in and check-out dates.');
+            return;
+        }
+        if (!selectedRoom) {
+            alert('Warning: You have not selected a room. You can proceed, but booking will not be possible until a room is selected.');
+        }
+        collectStep1Data();
+        console.log('Step 1 data collected:', bookingData);
+        showStep(currentStep + 1);
+    } else if (currentStep === 2) {
+        if (!validateGuestDetails()) {
+            return;
+        }
+        collectStep2Data();
+        console.log('Step 2 data collected:', bookingData);
+        showStep(currentStep + 1);
+    } else if (currentStep === 3) {
+        collectStep3Data();
+        console.log('Step 3 data collected:', bookingData);
+        showStep(currentStep + 1);
+    } else if (currentStep === 4) {
+        // We're already at the final step, just show the summary
+        showBookingSummary();
+        console.log('Final booking data:', bookingData);
+        return; // Don't proceed to next step, we're already at the final step
+    }
+}
+
+function prevStep() {
+    showStep(currentStep - 1);
+}
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.booking-step').forEach(s => s.style.display = 'none');
+    
+    // Show current step
+    document.getElementById(`step${step}Content`).style.display = 'block';
+    
+    // Update progress
+    document.getElementById('bookingProgress').style.width = `${(step / 4) * 100}%`;
+    
+    // Update step indicators
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(`step${step}`).classList.add('active');
+    
+    currentStep = step;
+}
+
+// Collect data from step 1
+function collectStep1Data() {
+    bookingData = {
+        room: selectedRoom,
+        checkin: document.getElementById('checkinDate').value,
+        checkout: document.getElementById('checkoutDate').value,
+        guestCount: document.getElementById('guestCount').value
+    };
+}
+
+// Validate guest details
+function validateGuestDetails() {
+    const name = document.getElementById('guestName').value.trim();
+    const email = document.getElementById('guestEmail').value.trim();
+    const phone = document.getElementById('guestPhone').value.trim();
+    
+    if (!name || !email || !phone) {
+        alert('Please fill in all required guest details.');
+        return false;
+    }
+    
+    if (!email.includes('@')) {
+        alert('Please enter a valid email address.');
+        return false;
+    }
+    
+    return true;
+}
+
+// Collect data from step 2
+function collectStep2Data() {
+    bookingData.guest = {
+        name: document.getElementById('guestName').value.trim(),
+        email: document.getElementById('guestEmail').value.trim(),
+        phone: document.getElementById('guestPhone').value.trim(),
+        paymentMethod: document.getElementById('paymentMethod').value,
+        specialRequests: document.getElementById('specialRequests').value.trim()
+    };
+}
+
+// Parking types and slots logic
+const sampleParkingTypes = [
+    { id: 1, name: 'Valet ',  price_per_day: 350, features: 'Valet Service, 24/7 Access, Secure, Fast Drop-off', image: 'images/parking1.jpg' },
+    { id: 2, name: 'Self-',price_per_day: 200, features: 'Self Service, 24/7 Access, Secure', image: 'images/parking2.jpg' },
+    { id: 3, name: 'Underground ', price_per_day: 250, features: 'CCTV, Climate Control, 24/7 Access, Secure', image: 'images/parking3.jpg' },
+    { id: 4, name: 'EV Charging ', price_per_day: 300, features: 'EV Charging, Fast Charge, 24/7 Access', image: 'images/parking4.jpg' },
+    { id: 5, name: 'VIP Reserved ', price_per_day: 500, features: 'VIP Access, Premium Security, Reserved', image: 'images/parking5.jpg' },
+    { id: 6, name: 'Two-Wheeler ', price_per_day: 100, features: 'Motorcycle, Scooter, 24/7 Access', image: 'images/parking6.jpg' },
+    { id: 7, name: 'Covered ', price_per_day: 180, features: 'Weather Protection, CCTV, 24/7 Access', image: 'images/parking7.jpg' },
+    { id: 8, name: 'Outdoor Guest ', price_per_day: 120, features: 'Open Air, General Access, 24/7', image: 'images/parking8.jpg' },
+    { id: 9, name: 'Long-Term ',  price_per_day: 150, features: 'Long-Term, Secure, 24/7 Access', image: 'images/parking9.jpg' },
+    { id: 10, name: 'Staff ', price_per_day: 0, features: 'Staff Only, Reserved, Secure', image: 'images/parking10.jpg' }
+];
+let parkingTypes = [];
+let selectedParkingType = null;
+let parkingSlots = [];
+
+function renderParkingTypes(types) {
+    const container = document.getElementById('parkingTypesContainer');
+    container.innerHTML = '';
+    types.forEach(type => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4 mb-4';
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm parking-type-card ${selectedParkingType && selectedParkingType.id === type.id ? 'border-primary' : ''}" onclick="selectParkingType(${type.id})">
+                <img src="${type.image}" class="card-img-top img-fluid" alt="${type.name} Parking" onerror="this.src='images/parking1.jpg'">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">${type.name} Parking</h5>
+                    <p class="card-text small text-muted">${type.description}</p>
+                    <div class="mb-2">${type.features ? type.features.split(',').map(f => `<span class='badge bg-info me-1 mb-1'>${f.trim()}</span>`).join('') : ''}</div>
+                    <div class="fw-bold mb-2">₹${type.price_per_day} per day</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function selectParkingType(typeId) {
+    selectedParkingType = parkingTypes.find(t => t.id === typeId);
+    renderParkingTypes(parkingTypes);
+    // Filter slots by selected parking type
+    if (selectedParkingType && parkingSlots && parkingSlots.length > 0) {
+        const filteredSlots = parkingSlots.filter(s => s.parking_type_id === selectedParkingType.id);
+        selectedParkingSlot = null; // Reset selected slot
+        renderParkingSlots(filteredSlots);
+    } else {
+        renderParkingSlots([]);
+    }
+}
+
+function toggleParkingOptions() {
+    console.log('toggleParkingOptions called');
+    const includeParking = document.getElementById('includeParking').checked;
+    const parkingOptions = document.getElementById('parkingOptions');
+    if (includeParking) {
+        parkingOptions.style.display = 'block';
+        loadParkingSlots();
+    } else {
+        parkingOptions.style.display = 'none';
+        renderParkingSlots([]); // Clear slots if parking not included
+    }
+}
+
+function loadParkingSlots() {
+    console.log('loadParkingSlots called');
+    const slotNames = [
+        'Valet Parking', 'Self-Parking', 'Underground Parking', 'EV Charging Parking', 'VIP Reserved Parking',
+        'Two-Wheeler Parking', 'Covered Parking', 'Outdoor Guest Parking', 'Long-Term Parking', 'Staff Parking',
+        'Valet Parking', 'Self-Parking', 'Underground Parking', 'EV Charging Parking', 'VIP Reserved Parking',
+        'Two-Wheeler Parking', 'Covered Parking', 'Outdoor Guest Parking', 'Long-Term Parking', 'Staff Parking',
+        'Valet Parking', 'Self-Parking', 'Underground Parking', 'EV Charging Parking', 'VIP Reserved Parking',
+        'Two-Wheeler Parking', 'Covered Parking', 'Outdoor Guest Parking', 'Long-Term Parking', 'Staff Parking'
+    ];
+    fetch('http://localhost:5000/api/parking/slots')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch slots');
+            return response.json();
+        })
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                parkingSlots = data;
+                console.log('parkingSlots (from backend):', parkingSlots);
+                // If a parking type is already selected, filter slots
+                if (selectedParkingType) {
+                    const filteredSlots = parkingSlots.filter(s => s.parking_type_id === selectedParkingType.id);
+                    renderParkingSlots(filteredSlots);
+                } else {
+                    renderParkingSlots(parkingSlots);
+                }
+            } else {
+                // If backend returns empty, use demo slots
+                const parkingImages = Array.from({length: 30}, (_, i) => `images/parking${i+1}.jpg`);
+                parkingSlots = Array.from({length: 30}, (_, i) => {
+                    return {
+                        id: i+1,
+                        label: `Slot ${i+1}`,
+                        name: slotNames[i],
+                        description: slotNames[i],
+                        image: parkingImages[i]
+                    };
+                });
+                console.log('parkingSlots (fallback demo):', parkingSlots);
+                renderParkingSlots(parkingSlots);
+            }
+        })
+        .catch(err => {
+            console.error('Error loading parking slots from backend:', err);
+            // fallback to demo slots
+            const parkingImages = Array.from({length: 30}, (_, i) => `images/parking${i+1}.jpg`);
+            parkingSlots = Array.from({length: 30}, (_, i) => {
+                return {
+                    id: i+1,
+                    label: `Slot ${i+1}`,
+                    name: slotNames[i],
+                    description: slotNames[i],
+                    image: parkingImages[i]
+                };
+            });
+            console.log('parkingSlots (fallback demo):', parkingSlots);
+            renderParkingSlots(parkingSlots);
+        });
+}
+
+function renderParkingSlots(slots) {
+    const container = document.getElementById('parkingSlotsContainer');
+    container.innerHTML = '';
+    if (!slots || slots.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No slots available.</div>';
+        return;
+    }
+    slots.forEach((slot, i) => {
+        const col = document.createElement('div');
+        col.className = 'col-6 col-md-3 col-lg-2 mb-3';
+        col.innerHTML = `
+            <div class="card parking-slot-card ${selectedParkingSlot && selectedParkingSlot.id === slot.id ? 'border-primary' : ''}"
+                 onclick="selectParkingSlot(${slot.id})">
+                <img src="${slot.image || 'images/parking1.jpg'}" class="card-img-top img-fluid" alt="${slot.label || slot.slot_number}" style="height:140px;object-fit:cover;">
+                <div class="card-body text-center py-2">
+                    <span class="fw-bold">Slot ${i+1}</span>
+                    ${(slot.type || slot.name) ? `<br><small class='text-muted'>${slot.type || slot.name}</small>` : ''}
+                </div>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function selectParkingSlot(slotId) {
+    selectedParkingSlot = parkingSlots.find(s => s.id === slotId);
+    renderParkingSlots(parkingSlots);
+}
+
+// Collect data from step 3
+function collectStep3Data() {
+    const includeParking = document.getElementById('includeParking').checked;
+    bookingData.parking = {
+        include: includeParking,
+        vehicleNumber: includeParking ? document.getElementById('vehicleNumber').value : '',
+        vehicleType: includeParking ? document.getElementById('vehicleType').value : '',
+        paymentMethod: includeParking ? document.getElementById('parkingPaymentMethod').value : '',
+        parkingType: includeParking && selectedParkingType ? selectedParkingType : null,
+        parkingSlot: includeParking && selectedParkingSlot ? selectedParkingSlot : null
+    };
+    console.log('Step 3 data collected - Parking included:', includeParking);
+    if (includeParking && !selectedParkingSlot) {
+        alert('Please select a parking slot to continue.');
+        throw new Error('Parking slot not selected');
+    }
+    console.log('Vehicle number:', document.getElementById('vehicleNumber').value);
+    console.log('Vehicle type:', document.getElementById('vehicleType').value);
+    console.log('Selected parking type:', selectedParkingType);
+    console.log('Selected parking slot:', selectedParkingSlot);
+    console.log('Final parking data:', bookingData.parking);
+}
+
+// Show booking summary
+function showBookingSummary() {
+    const summary = document.getElementById('bookingSummary');
+    const roomTotal = bookingData.room.price * Math.ceil((new Date(bookingData.checkout) - new Date(bookingData.checkin)) / (1000 * 60 * 60 * 24));
+    const parkingTotal = bookingData.parking && bookingData.parking.include ? 0 : 0;
+    const grandTotal = roomTotal + parkingTotal;
+    
+    summary.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6><i class="bi bi-house me-2"></i>Room Details</h6>
+                <p><strong>Room:</strong> ${bookingData.room.number} (${bookingData.room.type})</p>
+                <p><strong>Check-in:</strong> ${bookingData.checkin}</p>
+                <p><strong>Check-out:</strong> ${bookingData.checkout}</p>
+                <p><strong>Guests:</strong> ${bookingData.guestCount}</p>
+                <p><strong>Room Total:</strong> $${roomTotal}</p>
+            </div>
+            <div class="col-md-6">
+                <h6><i class="bi bi-person me-2"></i>Guest Details</h6>
+                <p><strong>Name:</strong> ${bookingData.guest.name}</p>
+                <p><strong>Email:</strong> ${bookingData.guest.email}</p>
+                <p><strong>Phone:</strong> ${bookingData.guest.phone}</p>
+            </div>
+        </div>
+        ${bookingData.parking && bookingData.parking.include ? `
+        <div class="row mt-3">
+            <div class="col-12">
+                <h6><i class="bi bi-car-front me-2"></i>Parking Details</h6>
+                <p><strong>Parking Included</strong></p>
+            </div>
+        </div>
+        ` : ''}
+        <div class="row mt-3">
+            <div class="col-12">
+                <h5 class="text-success"><strong>Grand Total: $${grandTotal}</strong></h5>
+            </div>
+        </div>
+    `;
+}
+
+// Show parking summary
+function showParkingSummary() {
+    const parkingSummary = document.getElementById('parkingSummary');
+    
+    if (bookingData.parking && bookingData.parking.include) {
+        parkingSummary.innerHTML = `
+            <div class="alert alert-success">
+                <h6><i class="bi bi-car-front me-2"></i>Parking Included</h6>
+                <p><strong>Parking Included</strong></p>
+            </div>
+        `;
+    } else {
+        parkingSummary.innerHTML = `
+            <div class="alert alert-secondary">
+                <i class="bi bi-info-circle me-2"></i>
+                No parking selected. You can add parking later if needed.
+            </div>
+        `;
+    }
+}
+
+// Confirm and create booking
+async function confirmBooking() {
+    console.log('confirmBooking function called');
+    console.log('Current booking data:', bookingData);
+    
+    const confirmBtn = document.getElementById('confirmBookingBtn');
+    if (!confirmBtn) {
+        console.error('Confirm button not found!');
+        alert('Error: Confirm button not found. Please refresh the page.');
+        return;
+    }
+    
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    
+    // Get the logged-in user
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log('User data:', user);
+    
+    if (!user || !user.id) {
+        alert('You must be logged in to make a booking.');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="bi bi-check-lg"></i> Confirm & Book Now';
+        return;
+    }
+    
+    // Validate booking data
+    if (!bookingData.room || !bookingData.guest) {
+        alert('Booking data is incomplete. Please go back and fill all required information.');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="bi bi-check-lg"></i> Confirm & Book Now';
+        return;
+    }
+    
+    try {
+        console.log('Creating room booking...');
+        // Create room booking
+        const roomResponse = await fetch('http://localhost:5000/api/bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: user.id,
+                room_id: bookingData.room.id,
+                check_in: bookingData.checkin,
+                check_out: bookingData.checkout,
+                guest_name: bookingData.guest.name,
+                guest_email: bookingData.guest.email,
+                guest_phone: bookingData.guest.phone,
+                guest_count: bookingData.guestCount,
+                payment_method: bookingData.guest.paymentMethod,
+                special_requests: bookingData.guest.specialRequests
+            })
+        });
+        
+        console.log('Room booking response status:', roomResponse.status);
+        const roomData = await roomResponse.json();
+        console.log('Room booking response:', roomData);
+        
+        if (!roomResponse.ok) {
+            alert(`Room booking failed: ${roomData.error || 'Unknown error'}`);
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="bi bi-check-lg"></i> Confirm & Book Now';
+            return;
+        }
+        
+        // Create parking booking if selected
+        if (bookingData.parking && bookingData.parking.include) {
+            console.log('Creating parking booking...');
+            const parkingResponse = await fetch('http://localhost:5000/api/parking/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    parking_slot_id: bookingData.parking.parkingSlot && bookingData.parking.parkingSlot.id,
+                    vehicle_number: bookingData.parking.vehicleNumber,
+                    vehicle_type: bookingData.parking.vehicleType,
+                    check_in_date: bookingData.checkin,
+                    check_out_date: bookingData.checkout,
+                    payment_method: bookingData.parking.paymentMethod
+                })
+            });
+            
+            console.log('Parking booking response status:', parkingResponse.status);
+            const parkingData = await parkingResponse.json();
+            console.log('Parking booking response:', parkingData);
+            
+            if (!parkingResponse.ok) {
+                alert(`Parking booking failed: ${parkingData.error || 'Unknown error'}. Room booking was successful.`);
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="bi bi-check-lg"></i> Confirm & Book Now';
+                return;
+            }
+            
+            alert('Room and parking booking confirmed successfully! You will receive confirmation emails shortly.');
+        } else {
+            alert('Room booking confirmed successfully! You will receive a confirmation email shortly.');
+        }
+        
+        console.log('Booking successful, redirecting to my_bookings.html');
+        window.location.href = 'my_bookings.html';
+        
+    } catch (error) {
+        console.error('Booking error:', error);
+        alert('Booking failed. Please check your connection and try again. Error: ' + error.message);
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="bi bi-check-lg"></i> Confirm & Book Now';
+    }
+}
+
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    let color = '#';
+    for (let i = 0; i < 3; i++) color += ('00' + ((hash >> (i * 8)) & 0xFF).toString(16)).slice(-2);
+    return color;
+}
+
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('user');
+        alert('Logged out successfully!');
+        window.location.href = 'login.html';
+    }
+}
+
+// Back to Top Button
+const backToTop = document.getElementById('backToTop');
+window.onscroll = function() {
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        backToTop.style.display = 'block';
+    } else {
+        backToTop.style.display = 'none';
+    }
+};
+backToTop.onclick = function() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+// Newsletter form
+const newsletterForm = document.querySelector('.newsletter-form');
+if(newsletterForm) newsletterForm.onsubmit = e => { e.preventDefault(); alert('Thank you for subscribing!'); };
+
+const user = JSON.parse(localStorage.getItem('user'));
+const profileIconContainer = document.getElementById('profileIconContainer');
+const authButtons = document.getElementById('authButtons');
+
+if (user) {
+    // User is logged in, show profile icon and hide auth buttons
+    if (authButtons) authButtons.innerHTML = '';
+    const firstLetter = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    const color = stringToColor(user.name || 'User');
+    profileIconContainer.innerHTML = `
+        <div onclick="toggleProfileSidebar()" style="cursor:pointer;">
+            <div style="width:36px;height:36px;border-radius:50%;background:${color};color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px;border:2px solid #fff;box-shadow:0 0 4px #0002;margin-left:10px;">${firstLetter}</div>
+        </div>
+    `;
+} else {
+    // User is not logged in, show auth buttons and hide profile icon
+    profileIconContainer.innerHTML = '';
+}
+
+function toggleProfileSidebar() {
+    const sidebar = document.getElementById('profileSidebar');
+    sidebar.classList.toggle('open');
+    if (sidebar.classList.contains('open')) loadProfileSidebar();
+}
+
+async function loadProfileSidebar() {
+    if (!user) return;
+    document.getElementById('profileAvatar').style.background = stringToColor(user.name || 'User');
+    document.getElementById('profileAvatar').textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    document.getElementById('sidebarUserName').textContent = user.name;
+    document.getElementById('sidebarUserEmail').textContent = user.email;
+    document.getElementById('sidebarUserPhone').textContent = user.phone || '-';
+    
+    // Fetch bookings with enhanced details
+    try {
+        const res = await fetch(`http://localhost:5000/api/bookings?user_id=${user.id}`);
+        const bookings = await res.json();
+        const tbody = document.getElementById('sidebarBookings');
+        tbody.innerHTML = '';
+        
+        if (Array.isArray(bookings) && bookings.length > 0) {
+            bookings.forEach(b => {
+                const statusBadge = b.status === 'confirmed' ? 'bg-success' : 
+                                   b.status === 'cancelled' ? 'bg-danger' : 'bg-warning';
+                const checkInDate = new Date(b.check_in).toLocaleDateString();
+                const checkOutDate = new Date(b.check_out).toLocaleDateString();
+                const totalAmount = b.total_amount ? `₹${b.total_amount}` : '₹0';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><small>#${b.id}</small></td>
+                        <td><small>Room ${b.room_id}</small></td>
+                        <td><small>${checkInDate}</small></td>
+                        <td><small>${checkOutDate}</small></td>
+                        <td><span class="badge ${statusBadge}">${b.status || 'confirmed'}</span></td>
+                        <td><small>${totalAmount}</small></td>
+                    </tr>
+                `;
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No bookings found</td></tr>';
+        }
+    } catch {
+        document.getElementById('sidebarBookings').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading bookings</td></tr>';
+    }
+}
+
+// Prevent going to next step if parking is included but no slot is selected
+const nextStep3Btn = document.getElementById('nextStep3');
+if (nextStep3Btn) {
+    nextStep3Btn.onclick = function() {
+        try {
+            collectStep3Data();
+            nextStep();
+        } catch (e) {
+            // Error already alerted
+        }
+    };
+}
+</script>
+
+<!-- Profile Sidebar -->
+<div id="profileSidebar" class="profile-sidebar">
+    <span class="close-btn" onclick="toggleProfileSidebar()">&times;</span>
+    <div id="profileAvatar" class="profile-avatar"></div>
+    <h5 class="text-center" id="sidebarUserName"></h5>
+    <p class="text-center mb-1" id="sidebarUserEmail"></p>
+    <p class="text-center mb-3" id="sidebarUserPhone"></p>
+    <h6><i class="bi bi-calendar-check me-2"></i>My Bookings</h6>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead><tr><th>ID</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Amount</th></tr></thead>
+            <tbody id="sidebarBookings"></tbody>
+        </table>
+    </div>
+    <div class="mt-3">
+        <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="window.location.href='my_bookings.html'">
+            <i class="bi bi-eye me-1"></i>View All Bookings
+        </button>
+        <button class="btn btn-sm btn-outline-danger w-100" onclick="logout()">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </button>
+    </div>
+</div>
+</body>
+</html> 

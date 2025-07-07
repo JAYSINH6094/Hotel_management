@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/hotel_lobby.jpg" alt="Hotel Logo" class="img-fluid" style="height:36px;width:36px;border-radius:8px;object-fit:cover;"> Hotel Kali
+        </a>
+        <div>
+            <a href="index.html" class="btn btn-outline-light">Home</a>
+            <a href="my_bookings.html" class="btn btn-outline-light">My Bookings</a>
+            <span id="profileIconContainer"></span>
+        </div>
+    </div>
+</nav>
+
+<div class="container fade-in mt-5">
+    <div class="row mb-4">
+        <div class="col-md-3 text-center">
+            <div id="profileImage" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#007bff,#0056b3);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:36px;border:3px solid #fff;box-shadow:0 0 8px #0002;margin:0 auto;">
+                U
+            </div>
+        </div>
+        <div class="col-md-9">
+            <h3 id="userName">User Name</h3>
+            <p><i class="bi bi-envelope me-2"></i><span id="userEmail">user@email.com</span></p>
+            <p><i class="bi bi-telephone me-2"></i><span id="userPhone">Phone</span></p>
+        </div>
+    </div>
+    <h4 class="mb-3">My Bookings</h4>
+    <table class="table table-striped shadow-sm">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Room</th>
+                <th>Type</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Guests</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody id="bookingsBody">
+            <!-- Bookings will be loaded here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<footer class="footer mt-auto">
+    <div class="footer-social">
+        <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" title="Twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" title="Mail"><i class="bi bi-envelope"></i></a>
+    </div>
+    <div>Contact us: hotelkali6094@gmail.com | 8733803700 | S.G. highway</div>
+    <div class="mt-2">&copy; 2024 Hotel Kali Demo. All rights reserved.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const user = JSON.parse(localStorage.getItem('user'));
+const profileIconContainer = document.getElementById('profileIconContainer');
+if (user) {
+    const firstLetter = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    profileIconContainer.innerHTML = `
+        <a href="profile.html" title="My Profile" class="text-decoration-none">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#007bff,#0056b3);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px;border:2px solid #fff;box-shadow:0 0 4px #0002;margin-left:10px;">
+                ${firstLetter}
+            </div>
+        </a>
+    `;
+}
+
+if (user) {
+    const firstLetter = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    document.getElementById('profileImage').textContent = firstLetter;
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userPhone').textContent = user.phone || '-';
+    loadBookings(user.id);
+} else {
+    document.querySelector('.container').innerHTML = '<div class="alert alert-danger">You must be logged in to view your profile.</div>';
+}
+
+async function loadBookings(userId) {
+    try {
+        const res = await fetch(`http://localhost:5000/api/bookings?user_id=${userId}`);
+        const bookings = await res.json();
+        const tbody = document.getElementById('bookingsBody');
+        tbody.innerHTML = '';
+        if (Array.isArray(bookings) && bookings.length > 0) {
+            for (const b of bookings) {
+                // Fetch room details for each booking
+                let roomType = '-', roomNumber = '-';
+                try {
+                    const roomRes = await fetch(`http://localhost:5000/api/rooms`);
+                    const rooms = await roomRes.json();
+                    const room = rooms.find(r => r.id === b.room_id);
+                    if (room) {
+                        roomType = room.type;
+                        roomNumber = room.number;
+                    }
+                } catch {}
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${b.id}</td>
+                        <td>${roomNumber}</td>
+                        <td>${roomType}</td>
+                        <td>${b.check_in}</td>
+                        <td>${b.check_out}</td>
+                        <td>${b.guest_count || 1}</td>
+                        <td>₹${b.total_amount ? b.total_amount.toFixed(2) : '-'}</td>
+                    </tr>
+                `;
+            }
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bookings found.</td></tr>';
+        }
+    } catch (err) {
+        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load bookings.</td></tr>';
+    }
+}
+</script>
+</body>
+</html> 
