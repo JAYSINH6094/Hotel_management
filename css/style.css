@@ -1,0 +1,732 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+/* General body styling */
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    /* padding-top: 60px; */
+    background-color: #f5f7fa;
+    color: #333;
+    min-height: 100vh;
+    position: relative;
+    transition: background 0.4s, color 0.4s;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(to right, #0062E6, #33AEFF);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.13);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s;
+}
+
+.navbar .navbar-brand {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar .navbar-brand img {
+    height: 36px;
+    margin-right: 10px;
+}
+
+.navbar .btn-outline-light {
+    margin-left: 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s, color 0.2s;
+}
+
+.navbar .btn-outline-light:hover {
+    background: #fff;
+    color: #0062E6;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    background: url('../images/hotel_banner.jpg') center/cover no-repeat;
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    border-radius: 18px;
+    margin-top: 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 98, 230, 0.45);
+    z-index: 1;
+}
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.hero p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 28px;
+    letter-spacing: 0.5px;
+}
+.hero .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    padding: 12px 32px;
+    border-radius: 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+    font-family: 'Playfair Display', serif;
+    color: #212529;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+h1 {
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+h2 {
+    font-weight: 600;
+    letter-spacing: 0.8px;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #0062E6;
+    border-color: #0062E6;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(.4,2,.3,1);
+    box-shadow: 0 2px 8px rgba(0,98,230,0.08);
+}
+
+.btn-primary:hover {
+    background-color: #004BB5;
+    border-color: #004BB5;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 18px rgba(0,98,230,0.18);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(.4,2,.3,1);
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    border-color: #545b62;
+    transform: translateY(-2px) scale(1.04);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(.4,2,.3,1);
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #218838;
+    transform: translateY(-2px) scale(1.04);
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 8px 24px rgba(0, 98, 230, 0.13), 0 1.5px 6px rgba(0,0,0,0.08);
+    border-radius: 18px;
+    border: none;
+    transition: transform 0.25s, box-shadow 0.25s, background 0.2s;
+    background: #fff;
+}
+.card:hover {
+    /* transform: translateY(-10px) scale(1.03); */
+    /* box-shadow: 0 20px 40px rgba(0,98,230,0.18), 0 2px 8px rgba(0,0,0,0.10); */
+    /* background: linear-gradient(120deg, #e3f0ff 0%, #f5f7fa 100%); */
+}
+.card-title, .card-subtitle {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
+
+.card-title {
+    font-weight: 700;
+}
+
+.card-body {
+    font-family: 'Inter', sans-serif;
+}
+
+.card img, .card-img-top {
+    height: 230px;
+    object-fit: cover;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+}
+
+/* Forms */
+form label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #555;
+    letter-spacing: 0.3px;
+}
+
+form input,
+form select {
+    font-family: 'Inter', sans-serif;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 12px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+form input:focus,
+form select:focus {
+    border-color: #0062E6;
+    box-shadow: 0 0 0 0.2rem rgba(0, 98, 230, 0.18);
+}
+
+form .btn {
+    width: 180px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* Tables */
+.table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+    font-family: 'Inter', sans-serif;
+}
+
+.table thead {
+    background-color: #0062E6;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.table tbody tr:hover {
+    background-color: #f2f4f7;
+    transition: background 0.2s;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+}
+
+/* Admin dashboard */
+.list-group a {
+    color: #0062E6;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.list-group a:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+    background: #343a40;
+    color: white;
+    text-align: center;
+    padding: 28px 10px 18px 10px;
+    margin-top: 60px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.10);
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+.footer .footer-social {
+    margin: 12px 0 8px 0;
+}
+.footer .footer-social a {
+    color: #fff;
+    margin: 0 10px;
+    font-size: 1.3rem;
+    transition: color 0.2s, transform 0.2s;
+}
+.footer .footer-social a:hover {
+    color: #33AEFF;
+    transform: scale(1.18) rotate(-8deg);
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 1.2s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .hero {
+        min-height: 220px;
+        padding: 30px 10px;
+    }
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .card img, .card-img-top {
+        height: 150px;
+    }
+    .footer {
+        font-size: 0.95rem;
+        padding: 18px 5px 10px 5px;
+    }
+    .navbar .container-fluid {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .navbar .btn-outline-light {
+        margin: 6px 0 0 0;
+        width: 100%;
+    }
+}
+@media (max-width: 992px) {
+    .card img, .card-img-top {
+        height: 120px;
+    }
+    .card-title {
+        font-size: 1.1rem;
+    }
+    .card-body {
+        padding: 14px 10px;
+    }
+    .col-md-4, .col-md-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .row {
+        flex-direction: column;
+    }
+}
+@media (max-width: 576px) {
+    .container, .container-fluid {
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+    .card {
+        border-radius: 14px;
+        margin-bottom: 18px;
+    }
+    .card-title {
+        font-size: 1rem;
+    }
+    .footer {
+        font-size: 0.9rem;
+        padding: 10px 2px 6px 2px;
+    }
+    .navbar .navbar-brand {
+        font-size: 1.1rem;
+    }
+    .btn, .btn-primary, .btn-success {
+        font-size: 1rem;
+        padding: 12px 16px;
+        border-radius: 16px;
+    }
+    .form-control, .form-select {
+        font-size: 1rem;
+        padding: 12px 10px;
+    }
+    .card-body {
+        padding: 10px 6px;
+    }
+    .container.fade-in {
+        padding: 12px 4px 10px 4px;
+        border-radius: 10px;
+    }
+}
+
+/* Back to Top Button */
+#backToTop {
+    display: none;
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 1050;
+    background: linear-gradient(90deg, #0062E6, #33AEFF);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 98, 230, 0.3);
+}
+#backToTop:hover {
+    background: linear-gradient(90deg, #004BB5, #0062E6);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 98, 230, 0.4);
+}
+
+/* Counter styling */
+.counter {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #0062E6;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
+}
+
+.counter-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #666;
+    letter-spacing: 0.5px;
+}
+
+/* Testimonials */
+.testimonials {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 40px 20px;
+    border-radius: 18px;
+    margin: 30px 0;
+}
+
+.testimonial-quote {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.testimonial-author {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0062E6;
+    letter-spacing: 0.5px;
+}
+
+/* Modal styling */
+.room-modal .modal-content {
+    border-radius: 18px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.room-modal .modal-header {
+    background: linear-gradient(135deg, #0062E6, #33AEFF);
+    color: white;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+.room-modal .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+/* Booking progress */
+.booking-progress {
+    margin-bottom: 30px;
+}
+
+.booking-progress .progress-bar {
+    background: linear-gradient(90deg, #0062E6, #33AEFF);
+    border-radius: 10px;
+}
+
+/* Badge styling */
+.badge-upcoming {
+    background: linear-gradient(135deg, #ffc107, #ffca2c);
+    color: #000;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+}
+
+.badge-completed {
+    background: linear-gradient(135deg, #28a745, #34ce57);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+}
+
+.badge-cancelled {
+    background: linear-gradient(135deg, #dc3545, #e74c3c);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+}
+
+/* Room filter */
+.room-filter {
+    margin-bottom: 20px;
+}
+
+.room-filter input, .room-filter select {
+    font-family: 'Inter', sans-serif;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+}
+
+/* Newsletter form */
+.newsletter-form {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.newsletter-form input[type="email"] {
+    font-family: 'Inter', sans-serif;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    width: 250px;
+    font-size: 0.95rem;
+}
+
+.newsletter-form button {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0062E6, #33AEFF);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.newsletter-form button:hover {
+    background: linear-gradient(135deg, #004BB5, #0062E6);
+    transform: translateY(-2px);
+}
+
+/* Tooltip styling */
+[data-bs-toggle="tooltip"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Modal animations */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Container fade-in */
+.container.fade-in {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Profile Sidebar Styles */
+.profile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    z-index: 2000;
+    transition: right 0.3s ease;
+    padding: 20px;
+    overflow-y: auto;
+    border-left: 3px solid #0062E6;
+}
+
+.profile-sidebar.open {
+    right: 0;
+}
+
+.profile-sidebar .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.profile-sidebar .close-btn:hover {
+    color: #0062E6;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    margin: 0 auto 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.profile-sidebar h5 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.profile-sidebar p {
+    font-family: 'Inter', sans-serif;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.profile-sidebar h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #333;
+    margin: 20px 0 15px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #0062E6;
+}
+
+.profile-sidebar .table {
+    font-size: 0.8rem;
+    margin-bottom: 15px;
+}
+
+.profile-sidebar .table th {
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.profile-sidebar .table td {
+    vertical-align: middle;
+    padding: 6px 4px;
+}
+
+.profile-sidebar .badge {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+}
+
+.profile-sidebar .btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.profile-sidebar .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive profile sidebar */
+@media (max-width: 768px) {
+    .profile-sidebar {
+        width: 300px;
+        right: -300px;
+        padding: 15px;
+    }
+    
+    .profile-sidebar .table {
+        font-size: 0.75rem;
+    }
+    
+    .profile-sidebar .table th,
+    .profile-sidebar .table td {
+        padding: 4px 2px;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-sidebar {
+        width: 280px;
+        right: -280px;
+        padding: 10px;
+    }
+    
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .profile-sidebar h5 {
+        font-size: 1rem;
+    }
+    
+    .profile-sidebar p {
+        font-size: 0.8rem;
+    }
+}

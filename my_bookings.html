@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+    .profile-sidebar {
+      position: fixed;
+      top: 0; right: -350px;
+      width: 350px; height: 100%;
+      background: #fff; z-index: 1050;
+      box-shadow: -2px 0 12px #0002;
+      transition: right 0.3s;
+      overflow-y: auto;
+    }
+    .profile-sidebar.open { right: 0; }
+    .profile-sidebar .close-btn {
+      position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer;
+    }
+    .profile-avatar {
+      width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #fff; margin: 0 auto 1rem auto;
+    }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/hotel_lobby.jpg" alt="Hotel Logo" class="img-fluid" style="height:36px;width:36px;border-radius:8px;object-fit:cover;"> Hotel Kali
+        </a>
+        <div class="d-flex align-items-center">
+            <a href="rooms.html" class="btn btn-outline-light me-2">Rooms</a>
+            <a href="booking.html" class="btn btn-outline-light me-2">Book Room & Parking</a>
+            <span id="authButtons">
+                <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+                <a href="register.html" class="btn btn-outline-light me-2">Register</a>
+            </span>
+            <span id="profileIconContainer"></span>
+        </div>
+    </div>
+</nav>
+
+<div class="container fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-check me-2"></i>My Bookings</h2>
+        <button class="btn btn-outline-primary" onclick="loadBookings()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th><i class="bi bi-hash text-primary"></i> Booking ID</th>
+                    <th><i class="bi bi-door-open text-success"></i> Room</th>
+                    <th><i class="bi bi-calendar-date text-info"></i> Check-in</th>
+                    <th><i class="bi bi-calendar-date text-info"></i> Check-out</th>
+                    <th><i class="bi bi-tag text-warning"></i> Status</th>
+                    <th><i class="bi bi-currency-rupee text-success"></i> Total Amount</th>
+                    <th><i class="bi bi-car-front text-secondary"></i> Parking</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsBody">
+                <!-- Bookings will be loaded here dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Back to Top Button -->
+<button id="backToTop" title="Back to Top"><i class="bi bi-arrow-up"></i></button>
+
+<!-- Profile Sidebar -->
+<div id="profileSidebar" class="profile-sidebar">
+    <span class="close-btn" onclick="toggleProfileSidebar()">&times;</span>
+    <div id="profileAvatar" class="profile-avatar"></div>
+    <h5 class="text-center" id="sidebarUserName"></h5>
+    <p class="text-center mb-1" id="sidebarUserEmail"></p>
+    <p class="text-center mb-3" id="sidebarUserPhone"></p>
+    <h6><i class="bi bi-calendar-check me-2"></i>My Bookings</h6>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead><tr><th>ID</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Amount</th></tr></thead>
+            <tbody id="sidebarBookings"></tbody>
+        </table>
+    </div>
+    <div class="mt-3">
+        <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="window.location.href='my_bookings.html'">
+            <i class="bi bi-eye me-1"></i>View All Bookings
+        </button>
+        <button class="btn btn-sm btn-outline-danger w-100" onclick="logout()">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </button>
+    </div>
+</div>
+
+<footer class="footer mt-auto">
+    <div class="footer-social">
+        <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" title="Twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" title="Mail"><i class="bi bi-envelope"></i></a>
+    </div>
+    <div>Contact us: hotelkali6094@gmail.com | 8733803700 | S.G. highway</div>
+    <form class="newsletter-form mt-2">
+        <input type="email" placeholder="Subscribe to our newsletter" required>
+        <button type="submit"><i class="bi bi-send"></i> Subscribe</button>
+    </form>
+    <div class="mt-2">&copy; 2024 Hotel Kali Demo. All rights reserved.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Back to Top Button
+const backToTop = document.getElementById('backToTop');
+window.onscroll = function() {
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        backToTop.style.display = 'block';
+    } else {
+        backToTop.style.display = 'none';
+    }
+};
+backToTop.onclick = function() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+// Newsletter form
+const newsletterForm = document.querySelector('.newsletter-form');
+if(newsletterForm) newsletterForm.onsubmit = e => { e.preventDefault(); alert('Thank you for subscribing!'); };
+
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    let color = '#';
+    for (let i = 0; i < 3; i++) color += ('00' + ((hash >> (i * 8)) & 0xFF).toString(16)).slice(-2);
+    return color;
+}
+
+const user = JSON.parse(localStorage.getItem('user'));
+const profileIconContainer = document.getElementById('profileIconContainer');
+const authButtons = document.getElementById('authButtons');
+
+if (user) {
+    // User is logged in, show profile icon and hide auth buttons
+    if (authButtons) authButtons.innerHTML = '';
+    const firstLetter = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    const color = stringToColor(user.name || 'User');
+    profileIconContainer.innerHTML = `
+        <div onclick="toggleProfileSidebar()" style="cursor:pointer;">
+            <div style="width:36px;height:36px;border-radius:50%;background:${color};color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px;border:2px solid #fff;box-shadow:0 0 4px #0002;margin-left:10px;">${firstLetter}</div>
+        </div>
+    `;
+} else {
+    // User is not logged in, show auth buttons and hide profile icon
+    profileIconContainer.innerHTML = '';
+}
+
+function toggleProfileSidebar() {
+    const sidebar = document.getElementById('profileSidebar');
+    sidebar.classList.toggle('open');
+    if (sidebar.classList.contains('open')) loadProfileSidebar();
+}
+
+async function loadProfileSidebar() {
+    if (!user) return;
+    document.getElementById('profileAvatar').style.background = stringToColor(user.name || 'User');
+    document.getElementById('profileAvatar').textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    document.getElementById('sidebarUserName').textContent = user.name;
+    document.getElementById('sidebarUserEmail').textContent = user.email;
+    document.getElementById('sidebarUserPhone').textContent = user.phone || '-';
+    
+    // Fetch bookings with enhanced details
+    try {
+        const res = await fetch(`http://localhost:5000/api/bookings?user_id=${user.id}`);
+        const bookings = await res.json();
+        const tbody = document.getElementById('sidebarBookings');
+        tbody.innerHTML = '';
+        
+        if (Array.isArray(bookings) && bookings.length > 0) {
+            bookings.forEach(b => {
+                const statusBadge = b.status === 'confirmed' ? 'bg-success' : 
+                                   b.status === 'cancelled' ? 'bg-danger' : 'bg-warning';
+                const checkInDate = new Date(b.check_in).toLocaleDateString();
+                const checkOutDate = new Date(b.check_out).toLocaleDateString();
+                const totalAmount = b.total_amount ? `₹${b.total_amount}` : '₹0';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><small>#${b.id}</small></td>
+                        <td><small>Room ${b.room_id}</small></td>
+                        <td><small>${checkInDate}</small></td>
+                        <td><small>${checkOutDate}</small></td>
+                        <td><span class="badge ${statusBadge}">${b.status || 'confirmed'}</span></td>
+                        <td><small>${totalAmount}</small></td>
+                    </tr>
+                `;
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No bookings found</td></tr>';
+        }
+    } catch {
+        document.getElementById('sidebarBookings').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading bookings</td></tr>';
+    }
+}
+
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('user');
+        alert('Logged out successfully!');
+        window.location.href = 'login.html';
+    }
+}
+
+async function loadBookings() {
+    if (!user || !user.id) {
+        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger">You must be logged in to view your bookings.</td></tr>';
+        return;
+    }
+    
+    console.log('Loading bookings for user ID:', user.id);
+    
+    try {
+        // Fetch room bookings
+        const roomRes = await fetch(`http://localhost:5000/api/bookings?user_id=${user.id}`);
+        const roomBookings = await roomRes.json();
+        
+        // Fetch parking bookings
+        const parkingRes = await fetch(`http://localhost:5000/api/parking/bookings?user_id=${user.id}`);
+        let parkingBookings = await parkingRes.json();
+        if (!Array.isArray(parkingBookings)) parkingBookings = [];
+        
+        console.log('Room bookings:', roomBookings);
+        console.log('Parking bookings:', parkingBookings);
+        
+        const tbody = document.getElementById('bookingsBody');
+        tbody.innerHTML = '';
+        
+        // Display room bookings
+        if (Array.isArray(roomBookings) && roomBookings.length > 0) {
+            roomBookings.forEach(b => {
+                const statusBadge = b.status === 'confirmed' ? 'bg-success' : 
+                                   b.status === 'cancelled' ? 'bg-danger' : 'bg-warning';
+                const checkInDate = new Date(b.check_in).toLocaleDateString();
+                const checkOutDate = new Date(b.check_out).toLocaleDateString();
+                const totalAmount = b.total_amount ? `₹${b.total_amount}` : '₹0';
+                
+                // Check if there's a parking booking for the same dates
+                const matchingParking = parkingBookings.find(p => 
+                    p.user_id === b.user_id && 
+                    p.check_in_date === b.check_in && 
+                    p.check_out_date === b.check_out
+                );
+                
+                const parkingStatus = matchingParking ? 
+                    `<span class="badge bg-success">Yes (${matchingParking.slot_number})</span>` : 
+                    '<span class="badge bg-secondary">No</span>';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#${b.id}</strong></td>
+                        <td><strong>Room ${b.room_id}</strong></td>
+                        <td>${checkInDate}</td>
+                        <td>${checkOutDate}</td>
+                        <td><span class="badge ${statusBadge}">${b.status || 'confirmed'}</span></td>
+                        <td><strong class="text-success">${totalAmount}</strong></td>
+                        <td>${parkingStatus}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Display parking-only bookings (if any)
+        const parkingOnlyBookings = parkingBookings.filter(p => 
+            !roomBookings.some(r => 
+                r.user_id === p.user_id && 
+                r.check_in === p.check_in_date && 
+                r.check_out === p.check_out_date
+            )
+        );
+        
+        parkingOnlyBookings.forEach(p => {
+            const statusBadge = p.status === 'confirmed' ? 'bg-success' : 
+                               p.status === 'cancelled' ? 'bg-danger' : 'bg-warning';
+            const checkInDate = new Date(p.check_in_date).toLocaleDateString();
+            const checkOutDate = new Date(p.check_out_date).toLocaleDateString();
+            const totalAmount = p.total_amount ? `₹${p.total_amount}` : '₹0';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>#P${p.id}</strong></td>
+                    <td><strong>Parking Only</strong></td>
+                    <td>${checkInDate}</td>
+                    <td>${checkOutDate}</td>
+                    <td><span class="badge ${statusBadge}">${p.status || 'confirmed'}</span></td>
+                    <td><strong class="text-success">${totalAmount}</strong></td>
+                    <td><span class="badge bg-success">Yes (${p.slot_number})</span></td>
+                </tr>
+            `;
+        });
+        
+        if (roomBookings.length === 0 && parkingBookings.length === 0) {
+            console.log('No bookings found');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No bookings found.</td></tr>';
+        }
+    } catch (err) {
+        console.error('Error loading bookings:', err);
+        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load bookings.</td></tr>';
+    }
+}
+
+loadBookings();
+</script>
+</body>
+</html>

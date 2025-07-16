@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/hotel_lobby.jpg" alt="Hotel Logo" class="img-fluid" style="height:36px;width:36px;border-radius:8px;object-fit:cover;"> Hotel Kali
+        </a>
+        <div>
+            <a href="index.html" class="btn btn-outline-light">Home</a>
+            <a href="admin_dashboard.html" class="btn btn-outline-light">Dashboard</a>
+            <a href="#" class="btn btn-outline-light" onclick="adminLogout()">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container fade-in mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h2>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="refreshData()">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                <i class="bi bi-speedometer2 me-2"></i>Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab">
+                <i class="bi bi-calendar-check me-2"></i>Room Bookings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="parking-tab" data-bs-toggle="tab" data-bs-target="#parking" type="button" role="tab">
+                <i class="bi bi-car-front me-2"></i>Parking Bookings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                <i class="bi bi-people me-2"></i>User Management
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="adminTabContent">
+        
+        <!-- Overview Tab -->
+        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="totalBookings">0</h4>
+                                    <p class="mb-0">Total Bookings</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-calendar-check fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="confirmedBookings">0</h4>
+                                    <p class="mb-0">Confirmed</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-check-circle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="totalRooms">0</h4>
+                                    <p class="mb-0">Total Rooms</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-house fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="totalRevenue">₹0</h4>
+                                    <p class="mb-0">Total Revenue</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-currency-rupee fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="totalParkingBookings">0</h4>
+                                    <p class="mb-0">Parking Bookings</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-car-front fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="cancelledBookings">0</h4>
+                                    <p class="mb-0">Cancelled</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-x-circle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 id="totalParkingRevenue">₹0</h4>
+                                    <p class="mb-0">Parking Revenue</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-currency-rupee fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Bookings Tab -->
+        <div class="tab-pane fade" id="bookings" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>All Room Bookings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Guest Name</th>
+                                    <th>Room</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Guests</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                <tr>
+                                    <td colspan="9" class="text-center">Loading bookings...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parking Bookings Tab -->
+        <div class="tab-pane fade" id="parking" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>All Parking Bookings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>User</th>
+                                    <th>Vehicle</th>
+                                    <th>Parking Slot</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parkingBookingsTableBody">
+                                <tr>
+                                    <td colspan="9" class="text-center">Loading parking bookings...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Management Tab -->
+        <div class="tab-pane fade" id="users" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-people me-2"></i>All Registered Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Registration Date</th>
+                                    <th>Total Bookings</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Booking Modal -->
+<div class="modal fade" id="editBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Room Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBookingForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Guest Name</label>
+                                <input type="text" class="form-control" id="editGuestName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Guest Email</label>
+                                <input type="email" class="form-control" id="editGuestEmail" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Guest Phone</label>
+                                <input type="tel" class="form-control" id="editGuestPhone">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Number of Guests</label>
+                                <input type="number" class="form-control" id="editGuestCount" min="1" value="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Check-in Date</label>
+                                <input type="date" class="form-control" id="editCheckIn" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Check-out Date</label>
+                                <input type="date" class="form-control" id="editCheckOut" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <select class="form-control" id="editPaymentMethod">
+                                    <option value="cash">Cash</option>
+                                    <option value="credit_card">Credit Card</option>
+                                    <option value="debit_card">Debit Card</option>
+                                    <option value="online">Online Payment</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" id="editStatus">
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Special Requests</label>
+                        <textarea class="form-control" id="editSpecialRequests" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveBookingChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Parking Booking Modal -->
+<div class="modal fade" id="editParkingBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Parking Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editParkingBookingForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Vehicle Number</label>
+                                <input type="text" class="form-control" id="editVehicleNumber" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Vehicle Type</label>
+                                <select class="form-control" id="editVehicleType">
+                                    <option value="car">Car</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="truck">Truck</option>
+                                    <option value="motorcycle">Motorcycle</option>
+                                    <option value="electric">Electric Vehicle</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Check-in Date</label>
+                                <input type="date" class="form-control" id="editParkingCheckIn" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Check-out Date</label>
+                                <input type="date" class="form-control" id="editParkingCheckOut" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <select class="form-control" id="editParkingPaymentMethod">
+                                    <option value="cash">Cash</option>
+                                    <option value="credit_card">Credit Card</option>
+                                    <option value="debit_card">Debit Card</option>
+                                    <option value="online">Online Payment</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" id="editParkingStatus">
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Total Amount</label>
+                        <input type="number" class="form-control" id="editParkingAmount" step="0.01" min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveParkingBookingChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-auto">
+    <div class="footer-social">
+        <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" title="Twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" title="Mail"><i class="bi bi-envelope"></i></a>
+    </div>
+    <div>Contact us: hotelkali6094@gmail.com | 8733803700 | S.G. highway</div>
+    <div class="mt-2">&copy; 2024 Hotel Kali Demo. All rights reserved.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let bookings = [];
+let parkingBookings = [];
+let users = [];
+let currentEditingBookingId = null;
+let currentEditingParkingBookingId = null;
+
+// Check admin authentication
+function checkAuth() {
+    const adminUser = localStorage.getItem('adminUser');
+    if (!adminUser) {
+        alert('Please login as admin first.');
+        window.location.href = 'admin_login.html';
+        return false;
+    }
+    return true;
+}
+
+// Logout function
+function logout() {
+    localStorage.removeItem('admin_token');
+    window.location.href = 'admin_login.html';
+}
+
+// Load all data
+async function loadAllData() {
+    await Promise.all([
+        loadBookings(),
+        loadParkingBookings(),
+        loadUsers()
+    ]);
+    updateAllStatistics();
+}
+
+// Load all bookings
+async function loadBookings() {
+    try {
+        const response = await fetch('http://localhost:5000/api/bookings');
+        if (!response.ok) {
+            throw new Error('Failed to fetch bookings');
+        }
+        
+        bookings = await response.json();
+        displayBookings(bookings);
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        document.getElementById('bookingsTableBody').innerHTML = 
+            '<tr><td colspan="9" class="text-center text-danger">Error loading bookings. Please try again.</td></tr>';
+    }
+}
+
+// Load parking bookings
+async function loadParkingBookings() {
+    try {
+        const response = await fetch('http://localhost:5000/api/parking/bookings');
+        if (!response.ok) {
+            throw new Error('Failed to fetch parking bookings');
+        }
+        
+        parkingBookings = await response.json();
+        displayParkingBookings(parkingBookings);
+    } catch (error) {
+        console.error('Error loading parking bookings:', error);
+        document.getElementById('parkingBookingsTableBody').innerHTML = 
+            '<tr><td colspan="9" class="text-center text-danger">Error loading parking bookings. Please try again.</td></tr>';
+    }
+}
+
+// Load users
+async function loadUsers() {
+    try {
+        const response = await fetch('http://localhost:5000/api/users');
+        users = await response.json();
+        displayUsers();
+    } catch (error) {
+        console.error('Error loading users:', error);
+        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading users</td></tr>';
+    }
+}
+
+// Display bookings in table
+function displayBookings(bookings) {
+    const tbody = document.getElementById('bookingsTableBody');
+    
+    if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No bookings found.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = bookings.map(booking => `
+        <tr>
+            <td><strong>#${booking.id}</strong></td>
+            <td>
+                <div><strong>${booking.guest_name || 'N/A'}</strong></div>
+                <small class="text-muted">${booking.guest_email || 'N/A'}</small><br>
+                <small class="text-muted">${booking.guest_phone || 'N/A'}</small>
+            </td>
+            <td>
+                <div><strong>Room ${booking.room_id}</strong></div>
+                <small class="text-muted">ID: ${booking.room_id}</small>
+            </td>
+            <td>${new Date(booking.check_in).toLocaleDateString()}</td>
+            <td>${new Date(booking.check_out).toLocaleDateString()}</td>
+            <td>
+                <span class="badge bg-info">${booking.guest_count || 1} Guest${booking.guest_count > 1 ? 's' : ''}</span>
+            </td>
+            <td>
+                <span class="badge bg-primary">${(booking.payment_method || 'cash').replace('_', ' ').toUpperCase()}</span>
+            </td>
+            <td>
+                <span class="badge bg-success">${booking.status || 'confirmed'}</span>
+            </td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="viewBooking(${booking.id})" title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="editBooking(${booking.id})" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="deleteBooking(${booking.id})" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Display parking bookings in table
+function displayParkingBookings(parkingBookings) {
+    const tbody = document.getElementById('parkingBookingsTableBody');
+    
+    if (parkingBookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No parking bookings found.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = parkingBookings.map(booking => `
+        <tr>
+            <td><strong>#${booking.id}</strong></td>
+            <td>
+                <div><strong>User ID: ${booking.user_id}</strong></div>
+                <small class="text-muted">Guest</small>
+            </td>
+            <td>
+                <div><strong>${booking.vehicle_number}</strong></div>
+                <small class="text-muted">${booking.vehicle_type}</small>
+            </td>
+            <td>
+                <span class="badge bg-info">Slot ${booking.parking_slot_id}</span>
+            </td>
+            <td>${new Date(booking.check_in_date).toLocaleDateString()}</td>
+            <td>${new Date(booking.check_out_date).toLocaleDateString()}</td>
+            <td>
+                <strong class="text-success">₹${booking.total_amount || 0}</strong>
+            </td>
+            <td>
+                <span class="badge bg-success">${booking.status || 'confirmed'}</span>
+            </td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="viewParkingBooking(${booking.id})" title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="editParkingBooking(${booking.id})" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="deleteParkingBooking(${booking.id})" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Display users
+function displayUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+    
+    if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No users found</td></tr>';
+        return;
+    }
+    
+    users.forEach(user => {
+        const registrationDate = new Date(user.created_at).toLocaleDateString();
+        const totalBookings = bookings.filter(b => b.user_id === user.id).length;
+        
+        tbody.innerHTML += `
+            <tr>
+                <td><strong>#${user.id}</strong></td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.phone || '-'}</td>
+                <td>${registrationDate}</td>
+                <td><span class="badge bg-primary">${totalBookings}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-info me-1" onclick="viewUser(${user.id})" title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})" title="Delete User">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+// Update all statistics
+function updateAllStatistics() {
+    // Room booking statistics
+    document.getElementById('totalBookings').textContent = bookings.length;
+    
+    const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+    document.getElementById('confirmedBookings').textContent = confirmed;
+    
+    const cancelled = bookings.filter(b => b.status === 'cancelled').length;
+    document.getElementById('cancelledBookings').textContent = cancelled;
+    
+    // Calculate total revenue
+    const totalRevenue = bookings.reduce((sum, booking) => {
+        return sum + (booking.total_amount || 0);
+    }, 0);
+    document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toLocaleString()}`;
+    
+    // Parking booking statistics
+    document.getElementById('totalParkingBookings').textContent = parkingBookings.length;
+    
+    const parkingRevenue = parkingBookings.reduce((sum, booking) => {
+        return sum + (booking.total_amount || 0);
+    }, 0);
+    document.getElementById('totalParkingRevenue').textContent = `₹${parkingRevenue.toLocaleString()}`;
+    
+    // Load room count
+    loadRoomCount();
+}
+
+// Load room count
+async function loadRoomCount() {
+    try {
+        const response = await fetch('http://localhost:5000/api/rooms');
+        if (response.ok) {
+            const rooms = await response.json();
+            document.getElementById('totalRooms').textContent = rooms.length;
+        }
+    } catch (error) {
+        console.error('Error loading room count:', error);
+    }
+}
+
+// Refresh data
+function refreshData() {
+    loadAllData();
+}
+
+// View booking details
+function viewBooking(bookingId) {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (booking) {
+        alert(`Booking #${booking.id}\n\nGuest: ${booking.guest_name}\nEmail: ${booking.guest_email}\nPhone: ${booking.guest_phone}\nRoom: ${booking.room_id}\nCheck-in: ${new Date(booking.check_in).toLocaleDateString()}\nCheck-out: ${new Date(booking.check_out).toLocaleDateString()}\nGuests: ${booking.guest_count}\nStatus: ${booking.status}\nPayment: ${booking.payment_method}`);
+    }
+}
+
+// View parking booking details
+function viewParkingBooking(bookingId) {
+    const booking = parkingBookings.find(b => b.id === bookingId);
+    if (booking) {
+        alert(`Parking Booking #${booking.id}\n\nUser ID: ${booking.user_id}\nVehicle: ${booking.vehicle_number} (${booking.vehicle_type})\nParking Slot: ${booking.parking_slot_id}\nCheck-in: ${new Date(booking.check_in_date).toLocaleDateString()}\nCheck-out: ${new Date(booking.check_out_date).toLocaleDateString()}\nAmount: ₹${booking.total_amount}\nStatus: ${booking.status}\nPayment: ${booking.payment_method}`);
+    }
+}
+
+// View user details
+function viewUser(userId) {
+    const user = users.find(u => u.id === userId);
+    if (user) {
+        const userBookings = bookings.filter(b => b.user_id === userId);
+        const userParkingBookings = parkingBookings.filter(p => p.user_id === userId);
+        
+        alert(`User Details:\n\nID: ${user.id}\nName: ${user.name}\nEmail: ${user.email}\nPhone: ${user.phone || 'Not provided'}\nRegistration Date: ${new Date(user.created_at).toLocaleDateString()}\n\nTotal Room Bookings: ${userBookings.length}\nTotal Parking Bookings: ${userParkingBookings.length}`);
+    }
+}
+
+// Edit booking
+function editBooking(bookingId) {
+    currentEditingBookingId = bookingId;
+    const booking = bookings.find(b => b.id === bookingId);
+    if (booking) {
+        document.getElementById('editGuestName').value = booking.guest_name || '';
+        document.getElementById('editGuestEmail').value = booking.guest_email || '';
+        document.getElementById('editGuestPhone').value = booking.guest_phone || '';
+        document.getElementById('editGuestCount').value = booking.guest_count || 1;
+        document.getElementById('editCheckIn').value = new Date(booking.check_in).toISOString().split('T')[0];
+        document.getElementById('editCheckOut').value = new Date(booking.check_out).toISOString().split('T')[0];
+        document.getElementById('editPaymentMethod').value = booking.payment_method || 'cash';
+        document.getElementById('editStatus').value = booking.status || 'confirmed';
+        document.getElementById('editSpecialRequests').value = booking.special_requests || '';
+        
+        const modal = new bootstrap.Modal(document.getElementById('editBookingModal'));
+        modal.show();
+    }
+}
+
+// Edit parking booking
+function editParkingBooking(bookingId) {
+    currentEditingParkingBookingId = bookingId;
+    const booking = parkingBookings.find(b => b.id === bookingId);
+    if (booking) {
+        document.getElementById('editVehicleNumber').value = booking.vehicle_number || '';
+        document.getElementById('editVehicleType').value = booking.vehicle_type || 'car';
+        document.getElementById('editParkingCheckIn').value = new Date(booking.check_in_date).toISOString().split('T')[0];
+        document.getElementById('editParkingCheckOut').value = new Date(booking.check_out_date).toISOString().split('T')[0];
+        document.getElementById('editParkingPaymentMethod').value = booking.payment_method || 'cash';
+        document.getElementById('editParkingStatus').value = booking.status || 'confirmed';
+        document.getElementById('editParkingAmount').value = booking.total_amount || 0;
+        
+        const modal = new bootstrap.Modal(document.getElementById('editParkingBookingModal'));
+        modal.show();
+    }
+}
+
+// Save booking changes
+async function saveBookingChanges() {
+    if (!currentEditingBookingId) {
+        alert('No booking selected for editing.');
+        return;
+    }
+    
+    const updateData = {
+        guest_name: document.getElementById('editGuestName').value,
+        guest_email: document.getElementById('editGuestEmail').value,
+        guest_phone: document.getElementById('editGuestPhone').value,
+        guest_count: parseInt(document.getElementById('editGuestCount').value),
+        check_in: document.getElementById('editCheckIn').value,
+        check_out: document.getElementById('editCheckOut').value,
+        payment_method: document.getElementById('editPaymentMethod').value,
+        status: document.getElementById('editStatus').value,
+        special_requests: document.getElementById('editSpecialRequests').value
+    };
+    
+    try {
+        const response = await fetch(`http://localhost:5000/api/bookings/${currentEditingBookingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Booking updated successfully!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editBookingModal'));
+            modal.hide();
+            loadAllData(); // Refresh all data
+        } else {
+            alert(data.error || 'Failed to update booking. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Save parking booking changes
+async function saveParkingBookingChanges() {
+    if (!currentEditingParkingBookingId) {
+        alert('No parking booking selected for editing.');
+        return;
+    }
+    
+    const updateData = {
+        vehicle_number: document.getElementById('editVehicleNumber').value,
+        vehicle_type: document.getElementById('editVehicleType').value,
+        check_in_date: document.getElementById('editParkingCheckIn').value,
+        check_out_date: document.getElementById('editParkingCheckOut').value,
+        payment_method: document.getElementById('editParkingPaymentMethod').value,
+        status: document.getElementById('editParkingStatus').value,
+        total_amount: parseFloat(document.getElementById('editParkingAmount').value)
+    };
+    
+    try {
+        const response = await fetch(`http://localhost:5000/api/parking/bookings/${currentEditingParkingBookingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Parking booking updated successfully!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editParkingBookingModal'));
+            modal.hide();
+            loadAllData(); // Refresh all data
+        } else {
+            alert(data.error || 'Failed to update parking booking. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error updating parking booking:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Delete booking
+async function deleteBooking(bookingId) {
+    if (confirm(`Are you sure you want to delete booking #${bookingId}? This action cannot be undone.`)) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert('Booking deleted successfully!');
+                loadAllData(); // Refresh all data
+            } else {
+                alert(data.error || 'Failed to delete booking. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting booking:', error);
+            alert('An error occurred. Please try again.');
+        }
+    }
+}
+
+// Delete parking booking
+async function deleteParkingBooking(bookingId) {
+    if (confirm(`Are you sure you want to delete parking booking #${bookingId}? This action cannot be undone.`)) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/parking/bookings/${bookingId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert('Parking booking deleted successfully!');
+                loadAllData(); // Refresh all data
+            } else {
+                alert(data.error || 'Failed to delete parking booking. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting parking booking:', error);
+            alert('An error occurred. Please try again.');
+        }
+    }
+}
+
+// Delete user permanently
+async function deleteUser(userId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) {
+        alert('User not found.');
+        return;
+    }
+    
+    const userBookings = bookings.filter(b => b.user_id === userId);
+    const userParkingBookings = parkingBookings.filter(p => p.user_id === userId);
+    
+    const confirmMessage = `Are you sure you want to PERMANENTLY DELETE user "${user.name}"?\n\nThis will also delete:\n- ${userBookings.length} room booking(s)\n- ${userParkingBookings.length} parking booking(s)\n\nThis action CANNOT be undone!`;
+    
+    if (confirm(confirmMessage)) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert(`User "${user.name}" has been permanently deleted along with all their bookings.`);
+                loadAllData(); // Refresh all data
+            } else {
+                alert(data.error || 'Failed to delete user. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('An error occurred. Please try again.');
+        }
+    }
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    if (checkAuth()) {
+        loadAllData();
+    }
+});
+
+// Admin logout function
+function adminLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('adminUser');
+        alert('Logged out successfully!');
+        window.location.href = 'admin_login.html';
+    }
+}
+</script>
+</body>
+</html>
